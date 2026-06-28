@@ -266,7 +266,7 @@ export default function IntermediacionSection() {
                   <BorderGlow
                     glowColor={norm.glowColor}
                     backgroundColor="#ffffff"
-                    colors={norm.colors}
+                    colors={[...norm.colors]}
                     borderRadius={20}
                     glowRadius={28}
                     glowIntensity={1.0}

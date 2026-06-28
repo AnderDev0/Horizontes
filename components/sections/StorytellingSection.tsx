@@ -138,7 +138,7 @@ function InfoCard({ dest, locale }: { dest: typeof destinations[0]; locale: stri
   return (
     <div className="h-full" style={{ perspective: 1000 }}>
       {g ? (
-        <BorderGlow glowColor={g.glowColor} backgroundColor={g.backgroundColor} colors={g.colors}
+        <BorderGlow glowColor={g.glowColor} backgroundColor={g.backgroundColor} colors={[...g.colors]}
           borderRadius={22} glowRadius={28} glowIntensity={1.1} edgeSensitivity={26} coneSpread={28} animated className="h-full">
           {inner}
         </BorderGlow>
