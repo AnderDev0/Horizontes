@@ -122,10 +122,10 @@ export default function WhyUsSection() {
               <div className={`text-2xl mb-5 ${colorClass}`}>{icon}</div>
 
               <h3 className="font-serif font-semibold text-lg text-white mb-3 leading-snug">
-                {t(`values.${key}.title`)}
+                {t(`values.${key}.title` as any)}
               </h3>
               <p className="font-sans text-mist/60 text-sm leading-relaxed">
-                {t(`values.${key}.desc`)}
+                {t(`values.${key}.desc` as any)}
               </p>
 
               {/* Hover line accent */}

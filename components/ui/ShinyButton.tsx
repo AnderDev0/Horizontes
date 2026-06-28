@@ -1,11 +1,12 @@
 'use client'
 
-import { motion, type AnimationProps } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 
-const shineAnimation: AnimationProps = {
-  initial: { '--x': '100%', scale: 0.95 } as never,
-  animate: { '--x': '-100%', scale: 1 } as never,
+// MotionProps spread — no AnimationProps type (whileTap lives in MotionProps, not AnimationProps)
+const shineAnimation = {
+  initial: { '--x': '100%', scale: 0.95 } as Record<string, unknown>,
+  animate: { '--x': '-100%', scale: 1 } as Record<string, unknown>,
   whileTap: { scale: 0.96 },
   transition: {
     repeat: Infinity,
