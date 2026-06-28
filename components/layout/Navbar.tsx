@@ -24,10 +24,11 @@ export default function Navbar() {
   }, [])
 
   const links = [
-    { href: `/${locale}/destinos`, label: t('destinations') },
+    { href: `/${locale}/destinos`,                 label: t('destinations') },
     { href: `/${locale}/intermediacion-turistica`, label: locale === 'es' ? 'Intermediación' : 'About Agency' },
-    { href: `/${locale}/nosotros`, label: t('about') },
-    { href: `/${locale}/contacto`, label: t('contact') },
+    { href: `/${locale}/nosotros`,                 label: t('about') },
+    { href: `/${locale}/proveedores`,              label: locale === 'es' ? 'Proveedores' : 'Partners' },
+    { href: `/${locale}/contacto`,                 label: t('contact') },
   ]
 
   const otherLocale = locale === 'es' ? 'en' : 'es'

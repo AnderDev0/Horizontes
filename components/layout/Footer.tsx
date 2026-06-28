@@ -94,9 +94,10 @@ export default function Footer() {
             </h3>
             <ul className="space-y-3">
               {[
-                { href: `/${locale}/nosotros`, label: t('about') },
+                { href: `/${locale}/nosotros`,                 label: t('about') },
                 { href: `/${locale}/intermediacion-turistica`, label: locale === 'es' ? 'Intermediación Turística' : 'Tourism Intermediation' },
-                { href: `/${locale}/contacto`, label: t('contact_footer') },
+                { href: `/${locale}/proveedores`,              label: locale === 'es' ? 'Proveedores' : 'Partners' },
+                { href: `/${locale}/contacto`,                 label: t('contact_footer') },
               ].map((item) => (
                 <li key={item.href}>
                   <Link

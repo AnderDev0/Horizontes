@@ -168,13 +168,13 @@ export default function StorytellingSection() {
   // Smooth spring (feels more physical than raw scroll)
   const smooth = useSpring(scrollYProgress, { stiffness: 120, damping: 30, restDelta: 0.001 })
 
-  /* ── Slide 0 (Colombia): visible 0→0.72, peaks at 0.3–0.58 ── */
-  const s0Opacity = useTransform(smooth, [0, 0.25, 0.55, 0.72], [0, 1, 1, 0])
-  const s0X       = useTransform(smooth, [0, 0.25, 0.55, 0.72], [48, 0, 0, -48])
+  /* ── Slide 0 (Colombia): visible desde el inicio → sale en 0.65 ── */
+  const s0Opacity = useTransform(smooth, [0, 0.06, 0.55, 0.68], [0, 1, 1, 0])
+  const s0X       = useTransform(smooth, [0, 0.06], [24, 0])
 
-  /* ── Slide 1 (Roma): visible 0.65→1.0 ── */
-  const s1Opacity = useTransform(smooth, [0.62, 0.82], [0, 1])
-  const s1X       = useTransform(smooth, [0.62, 0.82], [48, 0])
+  /* ── Slide 1 (Roma): entra en 0.60 → visible hasta el final ── */
+  const s1Opacity = useTransform(smooth, [0.60, 0.75], [0, 1])
+  const s1X       = useTransform(smooth, [0.60, 0.75], [48, 0])
 
   /* ── Progress bar ── */
   const barScale = useTransform(smooth, [0, 1], [0, 1])
