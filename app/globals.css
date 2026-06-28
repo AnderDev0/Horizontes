@@ -1,0 +1,236 @@
+@import "tailwindcss";
+
+@theme {
+  /* Brand Colors */
+  --color-night: #0F172A;
+  --color-dusk: #1E293B;
+  --color-twilight: #1e3a5f;
+  --color-slate-border: #334155;
+  --color-leaf: #22C55E;
+  --color-forest: #15803D;
+  --color-leaf-light: #DCFCE7;
+  --color-mist: #94A3B8;
+  --color-mist-bright: #CBD5E1;
+  --color-gold: #F59E0B;
+  --color-gold-bright: #FCD34D;
+
+  /* Typography */
+  --font-serif: "Playfair Display", Georgia, serif;
+  --font-sans: "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-label: "Space Grotesk", monospace;
+
+  /* Spacing */
+  --spacing-section: 6rem;
+  --spacing-container: 1280px;
+
+  /* Border radius */
+  --radius-card: 1rem;
+  --radius-btn: 100px;
+  --radius-xl: 1.5rem;
+}
+
+/* ── Root variables ── */
+:root {
+  --nav-height: 80px;
+  --primary: 142 71% 45%; /* HSL for #22C55E used by ShinyButton */
+}
+
+/* ── BackgroundGradientAnimation blob keyframes ── */
+@keyframes hga-move-circle {
+  0%   { transform: rotate(0deg); }
+  50%  { transform: rotate(180deg); }
+  100% { transform: rotate(360deg); }
+}
+@keyframes hga-move-vertical {
+  0%   { transform: translateY(-40%); }
+  50%  { transform: translateY(40%); }
+  100% { transform: translateY(-40%); }
+}
+@keyframes hga-move-horizontal {
+  0%   { transform: translateX(-40%) translateY(-8%); }
+  50%  { transform: translateX(40%) translateY(8%); }
+  100% { transform: translateX(-40%) translateY(-8%); }
+}
+
+.animate-hga-first  { animation: hga-move-vertical   30s ease infinite; }
+.animate-hga-second { animation: hga-move-circle      20s reverse infinite; }
+.animate-hga-third  { animation: hga-move-circle      40s linear infinite; }
+.animate-hga-fourth { animation: hga-move-horizontal  40s ease infinite; }
+.animate-hga-fifth  { animation: hga-move-circle      20s ease infinite; }
+
+/* ── Aurora keyframe ── */
+@keyframes aurora-drift {
+  0%   { transform: translate(0%, 0%) scale(1); }
+  33%  { transform: translate(15%, -18%) scale(1.12); }
+  66%  { transform: translate(-10%, 14%) scale(0.9); }
+  100% { transform: translate(0%, 0%) scale(1); }
+}
+
+/* ── Shiny sweep keyframe ── */
+@keyframes shiny-sweep {
+  from { --x: 100%; }
+  to   { --x: -100%; }
+}
+
+@property --x {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 100%;
+}
+
+/* ── Base ── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+body {
+  background-color: theme(--color-night);
+  color: #ffffff;
+  font-family: theme(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* ── Custom scrollbar ── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0F172A;
+}
+::-webkit-scrollbar-thumb {
+  background: #22C55E;
+  border-radius: 100px;
+}
+
+/* ── Selection ── */
+::selection {
+  background-color: #22C55E33;
+  color: #22C55E;
+}
+
+/* ── Typography classes ── */
+.font-serif { font-family: theme(--font-serif); }
+.font-sans  { font-family: theme(--font-sans); }
+.font-label { font-family: theme(--font-label); }
+
+/* ── Glassmorphism ── */
+.glass {
+  background: rgba(30, 41, 59, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(51, 65, 85, 0.5);
+}
+
+.glass-dark {
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(51, 65, 85, 0.4);
+}
+
+/* ── Container ── */
+.container-wide {
+  width: 100%;
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+/* ── Section spacing ── */
+.section-py {
+  padding-top: 6rem;
+  padding-bottom: 6rem;
+}
+
+/* ── Gradient backgrounds ── */
+.bg-hero-gradient {
+  background: radial-gradient(ellipse at 70% 40%, #1e3a5f 0%, #1E293B 40%, #0F172A 100%);
+}
+
+.bg-card-gradient {
+  background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
+}
+
+/* ── Text gradient ── */
+.text-gradient-green {
+  background: linear-gradient(135deg, #4ade80 0%, #22C55E 50%, #15803D 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Grain texture overlay ── */
+.grain::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  z-index: 1;
+}
+
+/* ── 3D perspective utility ── */
+.perspective-1200 { perspective: 1200px; }
+.preserve-3d { transform-style: preserve-3d; }
+
+/* ── Hover glow ── */
+.hover-glow {
+  transition: box-shadow 0.3s ease;
+}
+.hover-glow:hover {
+  box-shadow: 0 0 30px rgba(34, 197, 94, 0.25);
+}
+
+/* ── Card border on hover ── */
+.card-hover {
+  border: 1px solid rgba(51, 65, 85, 0.6);
+  transition: border-color 0.3s ease, transform 0.3s ease;
+}
+.card-hover:hover {
+  border-color: rgba(34, 197, 94, 0.5);
+}
+
+/* ── Animated line under headings ── */
+.heading-underline {
+  position: relative;
+  display: inline-block;
+}
+.heading-underline::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -8px;
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, #22C55E, #15803D);
+  border-radius: 100px;
+}
+
+/* ── WhatsApp pulse ── */
+@keyframes wa-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
+  50% { box-shadow: 0 0 0 12px rgba(34, 197, 94, 0); }
+}
+.wa-pulse {
+  animation: wa-pulse 2s ease-in-out infinite;
+}
+
+/* ── Scroll progress bar ── */
+#scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #22C55E, #15803D);
+  z-index: 9999;
+  transform-origin: left;
+}

@@ -1,0 +1,159 @@
+{
+  "nav": {
+    "destinations": "Destinations",
+    "experiences": "Experiences",
+    "about": "About Us",
+    "contact": "Contact",
+    "quote": "Get a Quote",
+    "rnt": "RNT Certified"
+  },
+  "hero": {
+    "badge": "Premium Tourism • Colombia & Europe",
+    "headline": "Experiences that transform",
+    "subheadline": "We design unique journeys that blend adventure, culture, comfort and safety. Discover the extraordinary.",
+    "cta_explore": "Explore Destinations",
+    "cta_quote": "Get My Quote",
+    "scroll": "Discover more"
+  },
+  "trust": {
+    "rnt": "RNT Certified",
+    "anato": "ANATO Member",
+    "nts": "NTS-AV Standard",
+    "years": "Sustainable Tourism",
+    "certified": "Certified Agency"
+  },
+  "destinations": {
+    "title": "Our Star Destinations",
+    "subtitle": "Two experiences designed for those who seek the extraordinary",
+    "badge_eco": "Eco-Tourism",
+    "badge_luxury": "Luxury & Romance",
+    "badge_adventure": "Adventure",
+    "per_person": "per person",
+    "from": "from",
+    "days": "days",
+    "nights": "nights",
+    "see_more": "See Itinerary",
+    "quote_package": "Quote This Package",
+    "cano": {
+      "name": "Caño Cristales",
+      "subtitle": "The River of Five Colors",
+      "location": "Sierra de La Macarena, Colombia",
+      "duration": "4 days / 3 nights",
+      "tagline": "Total disconnection in Colombia's natural paradise"
+    },
+    "roma": {
+      "name": "Roma Infinita",
+      "subtitle": "The Grand Tour of Italy",
+      "location": "Rome, Italy & Amalfi Coast",
+      "duration": "8 days / 7 nights",
+      "tagline": "History, art, fine dining and Italian romance"
+    }
+  },
+  "why": {
+    "title": "Why travel with Horizontes?",
+    "subtitle": "Four pillars that make every journey a transformative experience",
+    "values": {
+      "service": {
+        "title": "Customer Service",
+        "desc": "Personalized attention before, during and after your trip. Your peace of mind is our priority."
+      },
+      "quality": {
+        "title": "Quality Commitment",
+        "desc": "We select the best hotels, guides and experiences. Every detail is carefully curated."
+      },
+      "sustainability": {
+        "title": "Sustainability",
+        "desc": "We travel with respect for destinations, local communities and the environment."
+      },
+      "innovation": {
+        "title": "Innovation",
+        "desc": "Unique and creative experiences that go beyond conventional tourism."
+      }
+    },
+    "stats": {
+      "destinations": "Destinations",
+      "packages": "Premium Packages",
+      "anato": "ANATO Member",
+      "compliance": "NTS-AV Certified"
+    }
+  },
+  "cta": {
+    "title": "Ready for your next adventure?",
+    "subtitle": "Our advisors design the perfect trip for you. No extra charges.",
+    "whatsapp": "Chat on WhatsApp",
+    "quote": "Request a Quote"
+  },
+  "contact": {
+    "title": "Design Your Ideal Adventure",
+    "subtitle": "Tell us your travel dreams and we'll create the perfect experience for you",
+    "form": {
+      "name": "Full name",
+      "email": "Email address",
+      "phone": "WhatsApp number",
+      "destination": "Destination of interest",
+      "destination_placeholder": "Select a destination",
+      "travelers": "Number of travelers",
+      "date": "Approximate travel date",
+      "budget": "Approximate budget (COP)",
+      "budget_placeholder": "Select your budget",
+      "budget_1": "$2,000,000 – $5,000,000",
+      "budget_2": "$5,000,000 – $10,000,000",
+      "budget_3": "More than $10,000,000",
+      "experience_type": "Experience type",
+      "eco": "Eco-Tourism",
+      "adventure": "Adventure",
+      "luxury": "Luxury",
+      "corporate": "Corporate",
+      "family": "Family",
+      "romantic": "Romantic / Honeymoon",
+      "message": "Additional message (optional)",
+      "habeas_data": "I accept the processing of my personal data according to the Habeas Data Policy of Horizontes Agencia de Viajes S.A.S. (Law 1581 of 2012)",
+      "submit": "Send via WhatsApp",
+      "whatsapp_alt": "Contact directly"
+    },
+    "info": {
+      "address": "Bogotá D.C., Colombia",
+      "hours": "Monday to Saturday: 8:00 am – 6:00 pm",
+      "email": "info@horizontesviajes.com.co",
+      "response": "We respond in less than 2 hours"
+    },
+    "trust": {
+      "rnt": "RNT No. [PENDING]",
+      "nit": "NIT: 901543175-9",
+      "anato": "ANATO Member",
+      "experience": "Purposeful Tourism"
+    }
+  },
+  "about": {
+    "title": "We are Horizontes",
+    "slogan": "Experiences that transform",
+    "mission_title": "Our Mission",
+    "mission": "To inspire and accompany in the creation of new stories with memorable, personalized experiences and sincere attention.",
+    "vision_title": "Our Vision 2031",
+    "vision": "To be the leading national and international agency recognized for innovation, passion and excellence in tourism service.",
+    "purpose_title": "Our Purpose",
+    "purpose": "To connect people with national and international destinations combining adventure, culture, comfort and safety."
+  },
+  "legal": {
+    "habeas_title": "Personal Data Processing Policy",
+    "terms_title": "Terms and Conditions",
+    "last_updated": "Last updated",
+    "back": "Back"
+  },
+  "footer": {
+    "slogan": "Experiences that transform",
+    "destinations": "Destinations",
+    "company": "Company",
+    "legal": "Legal",
+    "social": "Social Media",
+    "rights": "All rights reserved",
+    "legal_notice": "Travel and Tourism Agency registered with the Ministry of Commerce, Industry and Tourism of Colombia.",
+    "terms": "Terms & Conditions",
+    "habeas": "Habeas Data",
+    "privacy": "Privacy Policy",
+    "pqr": "PQR",
+    "about": "About Us",
+    "contact_footer": "Contact",
+    "whatsapp": "WhatsApp"
+  }
+}

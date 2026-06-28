@@ -1,0 +1,159 @@
+{
+  "nav": {
+    "destinations": "Destinos",
+    "experiences": "Experiencias",
+    "about": "Nosotros",
+    "contact": "Contacto",
+    "quote": "Cotizar Viaje",
+    "rnt": "RNT Certificado"
+  },
+  "hero": {
+    "badge": "Turismo Premium • Colombia & Europa",
+    "headline": "Experiencias que transforman",
+    "subheadline": "Diseñamos viajes únicos que combinan aventura, cultura, comodidad y seguridad. Descubre lo extraordinario.",
+    "cta_explore": "Explorar Destinos",
+    "cta_quote": "Cotizar mi Viaje",
+    "scroll": "Descubre más"
+  },
+  "trust": {
+    "rnt": "RNT Certificado",
+    "anato": "Miembro ANATO",
+    "nts": "Norma NTS-AV",
+    "years": "Turismo Sostenible",
+    "certified": "Agencia Certificada"
+  },
+  "destinations": {
+    "title": "Nuestros Destinos Estrella",
+    "subtitle": "Dos experiencias diseñadas para quienes buscan lo extraordinario",
+    "badge_eco": "Ecoturismo",
+    "badge_luxury": "Lujo & Romance",
+    "badge_adventure": "Aventura",
+    "per_person": "por persona",
+    "from": "desde",
+    "days": "días",
+    "nights": "noches",
+    "see_more": "Ver Itinerario",
+    "quote_package": "Cotizar este Paquete",
+    "cano": {
+      "name": "Caño Cristales",
+      "subtitle": "El Río de los Cinco Colores",
+      "location": "Sierra de La Macarena, Colombia",
+      "duration": "4 días / 3 noches",
+      "tagline": "Desconexión total en el paraíso natural de Colombia"
+    },
+    "roma": {
+      "name": "Roma Infinita",
+      "subtitle": "El Gran Tour de Italia",
+      "location": "Roma, Italia & Costa Amalfitana",
+      "duration": "8 días / 7 noches",
+      "tagline": "Historia, arte, gastronomía de gama alta y romance italiano"
+    }
+  },
+  "why": {
+    "title": "¿Por qué viajar con Horizontes?",
+    "subtitle": "Cuatro pilares que hacen de cada viaje una experiencia que transforma",
+    "values": {
+      "service": {
+        "title": "Servicio al Cliente",
+        "desc": "Atención personalizada antes, durante y después de tu viaje. Tu tranquilidad es nuestra prioridad."
+      },
+      "quality": {
+        "title": "Compromiso con la Calidad",
+        "desc": "Seleccionamos los mejores hoteles, guías y experiencias. Cada detalle está cuidado al máximo."
+      },
+      "sustainability": {
+        "title": "Sostenibilidad",
+        "desc": "Viajamos con respeto por los destinos, las comunidades locales y el medio ambiente."
+      },
+      "innovation": {
+        "title": "Innovación",
+        "desc": "Experiencias únicas y creativas que van más allá del turismo convencional."
+      }
+    },
+    "stats": {
+      "destinations": "Destinos",
+      "packages": "Paquetes Premium",
+      "anato": "Miembro ANATO",
+      "compliance": "NTS-AV Certificado"
+    }
+  },
+  "cta": {
+    "title": "¿Listo para tu próxima aventura?",
+    "subtitle": "Nuestros asesores diseñan el viaje perfecto para ti. Sin costos adicionales.",
+    "whatsapp": "Chatear por WhatsApp",
+    "quote": "Solicitar Cotización"
+  },
+  "contact": {
+    "title": "Diseña tu Aventura Ideal",
+    "subtitle": "Cuéntanos tus sueños de viaje y creamos la experiencia perfecta para ti",
+    "form": {
+      "name": "Nombre completo",
+      "email": "Correo electrónico",
+      "phone": "WhatsApp",
+      "destination": "Destino de interés",
+      "destination_placeholder": "Selecciona un destino",
+      "travelers": "Número de viajeros",
+      "date": "Fecha aproximada del viaje",
+      "budget": "Presupuesto aproximado (COP)",
+      "budget_placeholder": "Selecciona tu presupuesto",
+      "budget_1": "$2.000.000 – $5.000.000",
+      "budget_2": "$5.000.000 – $10.000.000",
+      "budget_3": "Más de $10.000.000",
+      "experience_type": "Tipo de experiencia",
+      "eco": "Ecoturismo",
+      "adventure": "Aventura",
+      "luxury": "Lujo",
+      "corporate": "Corporativo",
+      "family": "Familia",
+      "romantic": "Romántico / Lunamiel",
+      "message": "Mensaje adicional (opcional)",
+      "habeas_data": "Acepto el tratamiento de mis datos personales según la Política de Habeas Data de Horizontes Agencia de Viajes S.A.S. (Ley 1581 de 2012)",
+      "submit": "Enviar por WhatsApp",
+      "whatsapp_alt": "Contactar directamente"
+    },
+    "info": {
+      "address": "Bogotá D.C., Colombia",
+      "hours": "Lunes a Sábado: 8:00 am – 6:00 pm",
+      "email": "info@horizontesviajes.com.co",
+      "response": "Respondemos en menos de 2 horas"
+    },
+    "trust": {
+      "rnt": "RNT No. [PENDIENTE]",
+      "nit": "NIT: 901543175-9",
+      "anato": "Miembro ANATO",
+      "experience": "Turismo con Propósito"
+    }
+  },
+  "about": {
+    "title": "Somos Horizontes",
+    "slogan": "Experiencias que transforman",
+    "mission_title": "Nuestra Misión",
+    "mission": "Inspirar y acompañar en la creación de nuevas historias con experiencias memorables, personalizadas y atención sincera.",
+    "vision_title": "Nuestra Visión 2031",
+    "vision": "Ser la agencia líder nacional e internacional reconocida por innovación, pasión y excelencia en el servicio turístico.",
+    "purpose_title": "Nuestro Propósito",
+    "purpose": "Conectar personas con destinos nacionales e internacionales combinando aventura, cultura, comodidad y seguridad."
+  },
+  "legal": {
+    "habeas_title": "Política de Tratamiento de Datos Personales",
+    "terms_title": "Términos y Condiciones",
+    "last_updated": "Última actualización",
+    "back": "Volver"
+  },
+  "footer": {
+    "slogan": "Experiencias que transforman",
+    "destinations": "Destinos",
+    "company": "Empresa",
+    "legal": "Legal",
+    "social": "Redes Sociales",
+    "rights": "Todos los derechos reservados",
+    "legal_notice": "Agencia de Viajes y Turismo registrada ante el Ministerio de Comercio, Industria y Turismo de Colombia.",
+    "terms": "Términos y Condiciones",
+    "habeas": "Habeas Data",
+    "privacy": "Política de Privacidad",
+    "pqr": "PQR",
+    "about": "Nosotros",
+    "contact_footer": "Contacto",
+    "whatsapp": "WhatsApp"
+  }
+}
