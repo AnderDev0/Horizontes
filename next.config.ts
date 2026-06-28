@@ -14,9 +14,6 @@ const config: NextConfig = {
       },
     ],
   },
-  experimental: {
-    optimizeCss: true,
-  },
 }
 
 export default withNextIntl(config)
