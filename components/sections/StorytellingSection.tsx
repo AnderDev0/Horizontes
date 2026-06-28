@@ -190,28 +190,15 @@ export default function StorytellingSection() {
       const p = clamp(-rect.top / range, 0, 1)
 
       /*
-       * Crossfade timeline (p = scroll progress 0→1):
-       *
-       *   Colombia:  enter 0.00→0.10 | hold 0.10→0.48 | exit 0.48→0.62
-       *   Roma:      enter 0.48→0.62 | hold 0.62→1.00
-       *
-       * At every p between 0.48 and 0.62, both slides are transitioning
-       * simultaneously → no gap, no white frame.
+       * Colombia: fully visible from p=0 → exits at p=0.48–0.62
+       * Roma:     invisible until p=0.48 → fully visible at p=0.62+
+       * Both transition simultaneously → zero white-gap frame
        */
-      const s0op = p < 0.10 ? norm(p, 0, 0.10)
-                 : p < 0.48 ? 1
-                 : p < 0.62 ? 1 - norm(p, 0.48, 0.62)
-                 : 0
-      const s0tx = p < 0.10 ? 40 * (1 - norm(p, 0, 0.10))
-                 : p < 0.48 ? 0
-                 : -30 * norm(p, 0.48, 0.62)
+      const s0op = p < 0.48 ? 1 : p < 0.62 ? 1 - norm(p, 0.48, 0.62) : 0
+      const s0tx = p < 0.48 ? 0 : -30 * norm(p, 0.48, 0.62)
 
-      const s1op = p < 0.48 ? 0
-                 : p < 0.62 ? norm(p, 0.48, 0.62)
-                 : 1
-      const s1tx = p < 0.48 ? 40
-                 : p < 0.62 ? 40 * (1 - norm(p, 0.48, 0.62))
-                 : 0
+      const s1op = p < 0.48 ? 0 : p < 0.62 ? norm(p, 0.48, 0.62) : 1
+      const s1tx = p < 0.62 ? 20 * (1 - (p < 0.48 ? 0 : norm(p, 0.48, 0.62))) : 0
 
       s0.style.opacity   = String(+(s0op.toFixed(3)))
       s0.style.transform = `translateX(${s0tx.toFixed(1)}px)`
@@ -219,7 +206,7 @@ export default function StorytellingSection() {
       s1.style.transform = `translateX(${s1tx.toFixed(1)}px)`
 
       if (bar)   bar.style.transform = `scaleX(${p.toFixed(3)})`
-      if (plane) plane.style.left    = `${(clamp(p * 1.15, 0, 1) * 100).toFixed(1)}%`
+      if (plane) plane.style.left    = `${(clamp(p * 1.1, 0, 1) * 100).toFixed(1)}%`
     }
 
     window.addEventListener('scroll', onScroll, { passive: true })
@@ -283,8 +270,8 @@ export default function StorytellingSection() {
           {/* Stage: top/bottom set by useEffect measurement */}
           <div ref={stageRef} className="absolute left-6 right-6" style={{ top: 210, bottom: 56 }}>
 
-            {/* Slide 0 — Colombia */}
-            <div ref={slide0Ref} className="absolute inset-0" style={{ opacity: 0, transform: 'translateX(40px)' }}>
+            {/* Slide 0 — Colombia: starts fully visible */}
+            <div ref={slide0Ref} className="absolute inset-0" style={{ opacity: 1, transform: 'translateX(0px)' }}>
               <div className="flex gap-6" style={{ height: '100%' }}>
                 <div className="flex-1 min-w-0" style={{ height: '100%' }}>
                   <InfoCard dest={destinations[0]} locale={locale} />
