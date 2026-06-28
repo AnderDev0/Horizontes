@@ -77,7 +77,10 @@ function InfoCard({ dest, locale }: { dest: typeof destinations[0]; locale: stri
   const catLabel = dest.category === 'eco'
     ? (locale === 'es' ? 'Ecoturismo' : 'Eco-Tourism')
     : (locale === 'es' ? 'Lujo & Romance' : 'Luxury & Romance')
-  const waUrl = getWhatsAppQuoteUrl({ name: '', phone: '', destination: name, travelers: '2', date: '', budget: '', experiences: [] }, locale)
+  const waUrl = getWhatsAppQuoteUrl(
+    { name: '', phone: '', destination: name, travelers: '2', date: '', budget: '', experiences: [] },
+    locale
+  )
 
   const inner = (
     <div className="p-6 flex flex-col gap-3.5" style={{ height: '100%' }}>
@@ -130,93 +133,107 @@ function InfoCard({ dest, locale }: { dest: typeof destinations[0]; locale: stri
   )
 
   return (
+    /* height: 100% here ensures BorderGlow fills the parent */
     <div style={{ height: '100%', perspective: 1000 }}>
       {g ? (
-        <BorderGlow glowColor={g.glowColor} backgroundColor={g.backgroundColor} colors={[...g.colors]}
-          borderRadius={22} glowRadius={28} glowIntensity={1.1} edgeSensitivity={26} coneSpread={28} animated className="h-full">
+        <BorderGlow
+          glowColor={g.glowColor}
+          backgroundColor={g.backgroundColor}
+          colors={[...g.colors]}
+          borderRadius={22}
+          glowRadius={28}
+          glowIntensity={1.1}
+          edgeSensitivity={26}
+          coneSpread={28}
+          animated
+          className="h-full"
+        >
           {inner}
         </BorderGlow>
-      ) : <div className="rounded-3xl border bg-white" style={{ height: '100%' }}>{inner}</div>}
+      ) : (
+        <div className="rounded-3xl border bg-white" style={{ height: '100%' }}>{inner}</div>
+      )}
     </div>
   )
 }
 
-/* ─── Main component ──────────────────────────────────────────────────────────── */
+/* ─── Main ────────────────────────────────────────────────────────────────────── */
 export default function StorytellingSection() {
   const locale = useLocale()
   const isEs   = locale === 'es'
 
-  /* DOM refs */
-  const outerRef  = useRef<HTMLDivElement>(null)
-  const headerRef = useRef<HTMLDivElement>(null)
-  const routeRef  = useRef<HTMLDivElement>(null)
-  const stageRef  = useRef<HTMLDivElement>(null)
-  const footerRef = useRef<HTMLDivElement>(null)
-  const slide0Ref = useRef<HTMLDivElement>(null)
-  const slide1Ref = useRef<HTMLDivElement>(null)
-  const barRef    = useRef<HTMLDivElement>(null)
-  const planeRef  = useRef<HTMLDivElement>(null)
+  const outerRef   = useRef<HTMLDivElement>(null)
+  const headerRef  = useRef<HTMLDivElement>(null)
+  const routeRef   = useRef<HTMLDivElement>(null)
+  const stageRef   = useRef<HTMLDivElement>(null)
+  const footerRef  = useRef<HTMLDivElement>(null)
+  const slide0Ref  = useRef<HTMLDivElement>(null)
+  const slide1Ref  = useRef<HTMLDivElement>(null)
+  const barRef     = useRef<HTMLDivElement>(null)
+  const planeRef   = useRef<HTMLDivElement>(null)
 
   /*
-   * Measure and set the stage height explicitly at runtime.
-   * This is more reliable than any h-full / flex-1 CSS chain because
-   * it reads actual rendered pixel heights and sets an inline style directly.
+   * LAYOUT: all elements inside the sticky panel use absolute positioning.
+   * useEffect measures header + route heights and sets the stage top/bottom
+   * so it fills EXACTLY the remaining space — no flex/grid height cascade.
+   *
+   * Padding constants (px):
+   *   paddingTop  = 48   (3rem  top)
+   *   paddingBot  = 24   (1.5rem bottom)
+   *   gap         = 16   (mb-4 between header→route and route→stage)
+   *   footerGap   = 12   (pt-3 above footer)
    */
   useEffect(() => {
+    const PAD_TOP = 48
+    const PAD_BOT = 24
+    const GAP     = 16
+
     const measure = () => {
-      if (!stageRef.current) return
-      const vh      = window.innerHeight
-      const headerH = headerRef.current?.offsetHeight ?? 0
-      const routeH  = routeRef.current?.offsetHeight  ?? 0
-      const footerH = footerRef.current?.offsetHeight ?? 0
-      // 48px padding-top + 24px padding-bottom + 16px mb-4 header + 16px mb-4 route + 12px pt-3 footer
-      const reserved = 48 + 24 + 16 + 16 + 12 + headerH + routeH + footerH
-      const h = Math.max(280, vh - reserved)
-      stageRef.current.style.height = `${h}px`
+      const header = headerRef.current
+      const route  = routeRef.current
+      const stage  = stageRef.current
+      const footer = footerRef.current
+      if (!header || !route || !stage || !footer) return
+
+      const stageTop    = PAD_TOP + header.offsetHeight + GAP + route.offsetHeight + GAP
+      const stageBottom = PAD_BOT + footer.offsetHeight + 12   // 12 = pt-3
+
+      stage.style.top    = `${stageTop}px`
+      stage.style.bottom = `${stageBottom}px`
     }
-    // Two-pass: once immediately (approximation) and once after fonts/images settle
+
     measure()
-    const t = setTimeout(measure, 300)
-    window.addEventListener('resize', measure)
+    // Second pass after fonts settle
+    const t = setTimeout(measure, 250)
+    window.addEventListener('resize', measure, { passive: true })
     return () => { clearTimeout(t); window.removeEventListener('resize', measure) }
   }, [])
 
-  /*
-   * GSAP ScrollTrigger animation.
-   * trigger = outerRef (300vh), scrub = true → tied to scroll position.
-   * No GSAP pin: CSS sticky handles the panel. No DOM mutations → no removeChild errors.
-   */
+  /* GSAP: ScrollTrigger drives slide animations, no pin (CSS sticky handles it) */
   useGSAP(() => {
     if (!outerRef.current) return
 
-    // Hide slides initially
     gsap.set([slide0Ref.current, slide1Ref.current], { opacity: 0, x: 40 })
     gsap.set(barRef.current,   { scaleX: 0 })
     gsap.set(planeRef.current, { left: '0%' })
 
-    const st = {
-      trigger: outerRef.current,
-      start:   'top top',
-      end:     'bottom bottom',
-      scrub:   1.4,
-    }
+    const st = { trigger: outerRef.current, start: 'top top', end: 'bottom bottom', scrub: 1.4 }
 
-    // Main timeline: slides + progress bar
     const tl = gsap.timeline({ scrollTrigger: st })
 
-    // Slide 0 — Colombia: enter (0→12%), hold (12→55%), exit (55→68%)
-    tl.to(slide0Ref.current, { opacity: 1, x: 0,   duration: 0.12, ease: 'power2.out'  }, 0)
-      .to(slide0Ref.current, { opacity: 1, x: 0,   duration: 0.43                       }, 0.12)
-      .to(slide0Ref.current, { opacity: 0, x: -40, duration: 0.13, ease: 'power2.in'   }, 0.55)
+    // Colombia: enter 0→12%, hold 12→55%, exit 55→68%
+    tl.to(slide0Ref.current, { opacity: 1, x: 0,   duration: 0.12, ease: 'power2.out' }, 0)
+      .to(slide0Ref.current, { opacity: 1, x: 0,   duration: 0.43 },                     0.12)
+      .to(slide0Ref.current, { opacity: 0, x: -40, duration: 0.13, ease: 'power2.in'  }, 0.55)
 
-    // Slide 1 — Roma: enter (60→75%), hold (75→100%)
-      .to(slide1Ref.current, { opacity: 1, x: 0,   duration: 0.15, ease: 'power2.out'  }, 0.60)
-      .to(slide1Ref.current, { opacity: 1, x: 0,   duration: 0.25                       }, 0.75)
+    // Roma: enter 60→75%, hold 75→100%
+      .to(slide1Ref.current, { opacity: 1, x: 0,   duration: 0.15, ease: 'power2.out' }, 0.60)
+      .to(slide1Ref.current, { opacity: 1, x: 0,   duration: 0.25 },                     0.75)
 
-    // Progress bar (full scroll)
-      .fromTo(barRef.current, { scaleX: 0 }, { scaleX: 1, ease: 'none', duration: 1    }, 0)
+    // Progress bar
+      .fromTo(barRef.current, { scaleX: 0 }, { scaleX: 1, ease: 'none', duration: 1 }, 0)
 
-    // Plane (independent, same trigger)
+    // Plane (independent timeline, same trigger)
     gsap.timeline({ scrollTrigger: st })
       .fromTo(planeRef.current,
         { left: '0%' },
@@ -226,52 +243,51 @@ export default function StorytellingSection() {
   }, { scope: outerRef })
 
   return (
-    /*
-     * Outer div: 300vh — provides the scroll distance.
-     * Inner sticky div: stays in viewport while the outer scrolls.
-     * GSAP animates the slides based on scroll progress through outerRef.
-     */
     <div ref={outerRef} style={{ height: '300vh' }} className="relative bg-[#F8FAFC]">
+
+      {/* Sticky panel: h-screen, everything inside is absolute */}
       <div className="sticky top-0 overflow-hidden bg-[#F8FAFC]" style={{ height: '100svh' }}>
 
-        {/* Dot grid */}
-        <div className="absolute inset-0 pointer-events-none"
-          style={{ backgroundImage: 'radial-gradient(rgba(15,23,42,0.05) 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
+        {/* Dot grid background */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{ backgroundImage: 'radial-gradient(rgba(15,23,42,0.05) 1px, transparent 1px)', backgroundSize: '32px 32px' }}
+        />
 
         {/* Progress bar */}
         <div
           ref={barRef}
           className="absolute top-0 left-0 right-0 z-10"
-          style={{ height: 2, background: 'linear-gradient(90deg,#22C55E,#F59E0B)', transformOrigin: 'left center' }}
+          style={{ height: 2, background: 'linear-gradient(90deg,#22C55E,#F59E0B)', transformOrigin: 'left center', transform: 'scaleX(0)' }}
         />
 
-        {/* Content column */}
+        {/* Centered content wrapper — absolute fill, padded */}
         <div
-          className="relative z-[1]"
-          style={{ height: '100%', maxWidth: 1280, margin: '0 auto', padding: '3rem 1.5rem 1.5rem', display: 'flex', flexDirection: 'column' }}
+          className="absolute inset-0"
+          style={{ maxWidth: 1280, margin: '0 auto', padding: '48px 24px 24px' }}
         >
 
           {/* Header */}
-          <div ref={headerRef} className="flex-none mb-4">
+          <div ref={headerRef}>
             <span className="flex items-center gap-2 font-label text-[10px] uppercase tracking-[0.22em] mb-3" style={{ color: 'rgba(34,197,94,0.7)' }}>
               <span className="w-5 h-px" style={{ background: 'rgba(34,197,94,0.4)' }} />
               {isEs ? 'Tu próximo viaje' : 'Your next journey'}
             </span>
-            <h2 className="font-serif font-bold text-[#0F172A] leading-tight" style={{ fontSize: 'clamp(1.75rem, 4vw, 3rem)' }}>
+            <h2 className="font-serif font-bold text-[#0F172A] leading-tight mb-0" style={{ fontSize: 'clamp(1.75rem,4vw,3rem)' }}>
               {isEs ? 'Elige tu destino extraordinario' : 'Choose your extraordinary destination'}
             </h2>
           </div>
 
           {/* Flight route BOG → FCO */}
-          <div ref={routeRef} className="flex-none relative mb-4 overflow-visible" style={{ height: 36 }}>
+          <div ref={routeRef} className="relative overflow-visible" style={{ height: 36, marginTop: 16 }}>
             <div className="absolute top-1/2 left-8 right-8 border-t-2 border-dashed" style={{ borderColor: '#22C55E28' }} />
             <div className="absolute left-2 top-1/2 -translate-y-1/2 flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full ring-4" style={{ background: '#22C55E', boxShadow: '0 0 0 4px rgba(34,197,94,0.2)' }} />
+              <div className="w-3 h-3 rounded-full" style={{ background: '#22C55E', boxShadow: '0 0 0 4px rgba(34,197,94,0.2)' }} />
               <span className="font-label text-[9px] uppercase tracking-wider" style={{ color: '#475569' }}>BOG</span>
             </div>
             <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-2">
               <span className="font-label text-[9px] uppercase tracking-wider" style={{ color: '#475569' }}>FCO</span>
-              <div className="w-3 h-3 rounded-full ring-4" style={{ background: '#F59E0B', boxShadow: '0 0 0 4px rgba(245,158,11,0.2)' }} />
+              <div className="w-3 h-3 rounded-full" style={{ background: '#F59E0B', boxShadow: '0 0 0 4px rgba(245,158,11,0.2)' }} />
             </div>
             <div ref={planeRef} className="absolute top-1/2 -translate-y-1/2" style={{ left: '0%' }}>
               <svg width="22" height="22" viewBox="0 0 24 24" fill="#0F172A"
@@ -281,8 +297,12 @@ export default function StorytellingSection() {
             </div>
           </div>
 
-          {/* Slides stage — height set by useEffect */}
-          <div ref={stageRef} className="relative flex-1" style={{ minHeight: 280 }}>
+          {/*
+            Stage: positioned absolutely with top/bottom set by useEffect.
+            This guarantees the stage fills EXACTLY the space between the route
+            and the footer, regardless of font loading or layout recalculations.
+          */}
+          <div ref={stageRef} className="absolute left-6 right-6" style={{ top: 200, bottom: 60 }}>
 
             {/* Slide 0 — Colombia */}
             <div ref={slide0Ref} className="absolute inset-0" style={{ opacity: 0 }}>
@@ -309,8 +329,12 @@ export default function StorytellingSection() {
             </div>
           </div>
 
-          {/* Footer strip */}
-          <div ref={footerRef} className="flex-none pt-3 flex items-center justify-between">
+          {/* Footer strip — absolute at bottom */}
+          <div
+            ref={footerRef}
+            className="absolute left-6 right-6 flex items-center justify-between"
+            style={{ bottom: 0 }}
+          >
             <p className="font-sans text-xs" style={{ color: '#94A3B8' }}>
               {isEs ? 'Desplázate para explorar' : 'Scroll to explore'}
             </p>
