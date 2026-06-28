@@ -1,15 +1,11 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useRef } from 'react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { gsap } from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useTranslations, useLocale } from 'next-intl'
 import { getWhatsAppDirectUrl } from '@/lib/whatsapp'
-
-gsap.registerPlugin(ScrollTrigger)
 
 // Ballpit uses vanilla three.js — no React 19 issues
 const Ballpit = dynamic(() => import('@/components/ui/Ballpit'), {
@@ -64,26 +60,6 @@ export default function HeroSection() {
   const t = useTranslations('hero')
   const locale = useLocale()
   const sectionRef = useRef<HTMLElement>(null)
-
-  /* scroll: fade content out */
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.to('.hero-content', {
-        y: '-12%',
-        opacity: 0.1,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: 'top top',
-          end: '65% top',
-          scrub: true,
-        },
-      })
-    })
-    return () => {
-      ctx.revert()
-    }
-  }, [])
 
   return (
     <section
