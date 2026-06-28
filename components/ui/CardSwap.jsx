@@ -43,7 +43,7 @@ const CardSwap = ({
   verticalDistance = 60,
   delay = 3500,
   pauseOnHover = true,
-  onCardClick,
+  onCardClick = undefined,
   skewAmount = 6,
   easing = 'elastic',
   children,
