@@ -31,7 +31,8 @@ function TravelingDot({ pathId, duration = 4 }: { pathId: string; duration?: num
         calcMode="spline"
         keySplines="0.4 0 0.6 1"
       >
-        <mptath href={`#${pathId}`} />
+        {/* @ts-ignore — mpath is valid SVG SMIL but not in React's type defs */}
+        <mpath href={`#${pathId}`} />
       </animateMotion>
     </circle>
   )
@@ -218,6 +219,7 @@ export default function GlobeScene() {
         {/* Traveling dot along arc */}
         <circle r="4.5" fill="#DCFCE7" opacity="0.95">
           <animateMotion dur="4s" repeatCount="indefinite">
+            {/* @ts-ignore */}
             <mpath href={`#${arcId}`} />
           </animateMotion>
         </circle>

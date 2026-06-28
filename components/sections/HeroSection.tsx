@@ -236,7 +236,7 @@ export default function HeroSection() {
         <motion.div
           className="w-px h-12 bg-gradient-to-b from-leaf/50 to-transparent"
           animate={{ scaleY: [0, 1, 0] }}
-          style={{ originY: '0%' as any }}
+          style={{ originY: 0 }}
           transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
         />
         <span className="font-label text-[8px] text-[#94A3B8] uppercase tracking-[0.22em]">

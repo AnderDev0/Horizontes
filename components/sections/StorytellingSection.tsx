@@ -18,7 +18,15 @@ gsap.registerPlugin(ScrollTrigger)
 
 const BorderGlow = dynamic(() => import('@/components/ui/BorderGlow'), { ssr: false })
 const CardSwap   = dynamic(() => import('@/components/ui/CardSwap').then(m => m.default), { ssr: false })
-const SwapCard   = dynamic(() => import('@/components/ui/CardSwap').then(m => m.Card),    { ssr: false })
+
+// Cast to typed component so TypeScript accepts children prop
+type SwapCardProps = { children?: React.ReactNode; style?: React.CSSProperties; className?: string }
+const SwapCard = dynamic(
+  () => import('@/components/ui/CardSwap').then(
+    m => m.Card as React.ComponentType<SwapCardProps>
+  ),
+  { ssr: false }
+)
 
 /* ─── Photo data ─────────────────────────────────────────────────────────────── */
 const PHOTOS = {
