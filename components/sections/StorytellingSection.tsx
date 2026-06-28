@@ -1,20 +1,16 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import {
-  useScroll, useTransform, useSpring,
-  motion, useMotionValue, useMotionTemplate,
+  useTransform, useSpring,
+  motion, useMotionValue,
 } from 'framer-motion'
-import { gsap } from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useLocale } from 'next-intl'
 import Link from 'next/link'
 import { ArrowUpRight, Check, Clock } from 'lucide-react'
 import { destinations } from '@/content/destinations'
 import { getWhatsAppQuoteUrl } from '@/lib/whatsapp'
-
-gsap.registerPlugin(ScrollTrigger)
 
 const BorderGlow = dynamic(() => import('@/components/ui/BorderGlow'), { ssr: false })
 const CardSwap   = dynamic(() => import('@/components/ui/CardSwap').then(m => m.default), { ssr: false })
@@ -155,33 +151,55 @@ export default function StorytellingSection() {
   const isEs = locale === 'es'
 
   /*
-   * useScroll tracks progress of the outer div (300vh) through the viewport.
-   * "start start" = when top of outer reaches top of viewport (sticky kicks in)
-   * "end end"     = when bottom of outer reaches bottom of viewport (sticky ends)
+   * Manual scroll tracking — more reliable than useScroll({ target }) in
+   * Next.js 15 / React 19 because we compute the section offset AFTER mount
+   * and subscribe directly to the window scroll event.
+   *
+   * rawProgress: 0 when section top hits viewport top,
+   *              1 when section bottom hits viewport bottom.
+   *
    * NO GSAP pin, NO DOM manipulation → zero removeChild errors.
    */
-  const { scrollYProgress } = useScroll({
-    target: outerRef,
-    offset: ['start start', 'end end'],
-  })
+  const rawProgress = useMotionValue(0)
 
-  // Smooth spring (feels more physical than raw scroll)
-  const smooth = useSpring(scrollYProgress, { stiffness: 120, damping: 30, restDelta: 0.001 })
+  useEffect(() => {
+    const compute = () => {
+      const el = outerRef.current
+      if (!el) return
+      const scrollTop  = window.scrollY
+      const sectionTop = el.offsetTop
+      // Total scroll distance = section height minus one viewport
+      const scrollRange = el.offsetHeight - window.innerHeight
+      if (scrollRange <= 0) return
+      const p = Math.min(Math.max((scrollTop - sectionTop) / scrollRange, 0), 1)
+      rawProgress.set(p)
+    }
 
-  /* ── Slide 0 (Colombia): visible desde el inicio → sale en 0.65 ── */
-  const s0Opacity = useTransform(smooth, [0, 0.06, 0.55, 0.68], [0, 1, 1, 0])
-  const s0X       = useTransform(smooth, [0, 0.06], [24, 0])
+    // Compute once on mount (handles cases where page loads mid-scroll)
+    compute()
+    window.addEventListener('scroll', compute, { passive: true })
+    window.addEventListener('resize', compute, { passive: true })
+    return () => {
+      window.removeEventListener('scroll', compute)
+      window.removeEventListener('resize', compute)
+    }
+  }, [rawProgress])
 
-  /* ── Slide 1 (Roma): entra en 0.60 → visible hasta el final ── */
-  const s1Opacity = useTransform(smooth, [0.60, 0.75], [0, 1])
-  const s1X       = useTransform(smooth, [0.60, 0.75], [48, 0])
+  // Smooth spring feels more physical than raw progress jumps
+  const smooth = useSpring(rawProgress, { stiffness: 90, damping: 25, restDelta: 0.001 })
+
+  /* ── Slide 0 (Colombia): fully visible from entry, exits at 0.65 ── */
+  const s0Opacity = useTransform(smooth, [0, 0.07, 0.52, 0.65], [0, 1, 1, 0])
+  const s0X       = useTransform(smooth, [0, 0.07, 0.52, 0.65], [40, 0, 0, -40])
+
+  /* ── Slide 1 (Roma): enters at 0.58, fully visible at 0.75 ── */
+  const s1Opacity = useTransform(smooth, [0.58, 0.75, 1], [0, 1, 1])
+  const s1X       = useTransform(smooth, [0.58, 0.75], [40, 0])
 
   /* ── Progress bar ── */
   const barScale = useTransform(smooth, [0, 1], [0, 1])
 
   /* ── Plane: travels full route width, fades near FCO ── */
-  // routeWidth computed reactively via a state would cause re-render;
-  // instead we drive in percentages of the container and let CSS handle pixels
   const planePercent = useTransform(smooth, [0, 0.88], ['0%', 'calc(100% - 56px)'])
   const planeOpacity = useTransform(smooth, [0.85, 1], [1, 0])
 
