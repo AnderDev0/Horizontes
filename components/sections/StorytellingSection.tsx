@@ -83,7 +83,7 @@ function InfoCard({ dest, locale }: { dest: typeof destinations[0]; locale: stri
   )
 
   const inner = (
-    <div className="p-6 flex flex-col gap-3.5" style={{ height: '100%' }}>
+    <div className="p-6 flex flex-col gap-3.5" style={{ height: '100%', overflowY: 'auto' }}>
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-2.5">
           <span className="text-3xl">{dest.flag}</span>
@@ -217,27 +217,39 @@ export default function StorytellingSection() {
     gsap.set(barRef.current,   { scaleX: 0 })
     gsap.set(planeRef.current, { left: '0%' })
 
-    const st = { trigger: outerRef.current, start: 'top top', end: 'bottom bottom', scrub: 1.4 }
+    const st = { trigger: outerRef.current, start: 'top top', end: 'bottom bottom', scrub: 0.8 }
 
     const tl = gsap.timeline({ scrollTrigger: st })
 
-    // Colombia: enter 0→12%, hold 12→55%, exit 55→68%
-    tl.to(slide0Ref.current, { opacity: 1, x: 0,   duration: 0.12, ease: 'power2.out' }, 0)
-      .to(slide0Ref.current, { opacity: 1, x: 0,   duration: 0.43 },                     0.12)
-      .to(slide0Ref.current, { opacity: 0, x: -40, duration: 0.13, ease: 'power2.in'  }, 0.55)
+    /*
+     * Crossfade timing — Colombia exit and Roma enter START at the same moment (t=0.48)
+     * so there is NEVER a frame where both slides have opacity 0.
+     *
+     * Colombia: enter (0→0.10), hold (0.10→0.48), exit (0.48→0.62)
+     * Roma:     enter (0.48→0.62),                 hold (0.62→1.00)
+     *
+     * At t=0.48: Colombia=1, Roma=0   → crossfade begins
+     * At t=0.55: Colombia≈0.57, Roma≈0.44 → both partially visible
+     * At t=0.62: Colombia=0, Roma=1   → crossfade complete
+     */
 
-    // Roma: enter 60→75%, hold 75→100%
-      .to(slide1Ref.current, { opacity: 1, x: 0,   duration: 0.15, ease: 'power2.out' }, 0.60)
-      .to(slide1Ref.current, { opacity: 1, x: 0,   duration: 0.25 },                     0.75)
+    // Colombia
+    tl.to(slide0Ref.current, { opacity: 1, x: 0,   duration: 0.10, ease: 'power2.out' }, 0)
+      .to(slide0Ref.current, { opacity: 1, x: 0,   duration: 0.38 },                     0.10)
+      .to(slide0Ref.current, { opacity: 0, x: -30, duration: 0.14, ease: 'power2.in'  }, 0.48)
+
+    // Roma — starts exactly when Colombia begins to exit
+      .to(slide1Ref.current, { opacity: 1, x: 0,   duration: 0.14, ease: 'power2.out' }, 0.48)
+      .to(slide1Ref.current, { opacity: 1, x: 0,   duration: 0.38 },                     0.62)
 
     // Progress bar
       .fromTo(barRef.current, { scaleX: 0 }, { scaleX: 1, ease: 'none', duration: 1 }, 0)
 
-    // Plane (independent timeline, same trigger)
+    // Plane
     gsap.timeline({ scrollTrigger: st })
       .fromTo(planeRef.current,
         { left: '0%' },
-        { left: 'calc(100% - 56px)', ease: 'none', duration: 0.88 },
+        { left: 'calc(100% - 56px)', ease: 'none', duration: 0.85 },
         0)
 
   }, { scope: outerRef })
