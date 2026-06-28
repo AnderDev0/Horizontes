@@ -2,29 +2,27 @@
 
 import { useRef, useEffect } from 'react'
 import dynamic from 'next/dynamic'
-import {
-  useTransform, useSpring,
-  motion, useMotionValue,
-} from 'framer-motion'
+import { useGSAP } from '@gsap/react'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useLocale } from 'next-intl'
 import Link from 'next/link'
 import { ArrowUpRight, Check, Clock } from 'lucide-react'
 import { destinations } from '@/content/destinations'
 import { getWhatsAppQuoteUrl } from '@/lib/whatsapp'
 
+gsap.registerPlugin(ScrollTrigger)
+
 const BorderGlow = dynamic(() => import('@/components/ui/BorderGlow'), { ssr: false })
 const CardSwap   = dynamic(() => import('@/components/ui/CardSwap').then(m => m.default), { ssr: false })
 
-// Cast to typed component so TypeScript accepts children prop
 type SwapCardProps = { children?: React.ReactNode; style?: React.CSSProperties; className?: string }
 const SwapCard = dynamic(
-  () => import('@/components/ui/CardSwap').then(
-    m => m.Card as React.ComponentType<SwapCardProps>
-  ),
+  () => import('@/components/ui/CardSwap').then(m => m.Card as React.ComponentType<SwapCardProps>),
   { ssr: false }
 )
 
-/* ─── Photo data ─────────────────────────────────────────────────────────────── */
+/* ─── Photo data ──────────────────────────────────────────────────────────────── */
 const PHOTOS = {
   'cano-cristales': [
     { label: 'El Tapete Rojo',             accent: '#4ade80', photo: 'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=640&h=480&fit=crop&q=80', text: 'Macarenia clavigera pinta el río de rojo, amarillo y verde' },
@@ -43,7 +41,7 @@ const GLOW = {
   'roma-italia':    { glowColor: '38 92 50',  backgroundColor: '#FFFBEB', colors: ['#F59E0B', '#FCD34D', '#D97706'], accent: '#F59E0B' },
 } as const
 
-/* ─── Photo stack ────────────────────────────────────────────────────────────── */
+/* ─── Photo stack ─────────────────────────────────────────────────────────────── */
 function PhotoStack({ slug }: { slug: string }) {
   const photos = PHOTOS[slug as keyof typeof PHOTOS] ?? []
   return (
@@ -67,7 +65,7 @@ function PhotoStack({ slug }: { slug: string }) {
   )
 }
 
-/* ─── Info card ──────────────────────────────────────────────────────────────── */
+/* ─── Info card ───────────────────────────────────────────────────────────────── */
 function InfoCard({ dest, locale }: { dest: typeof destinations[0]; locale: string }) {
   const name     = locale === 'es' ? dest.nameEs     : dest.nameEn
   const subtitle = locale === 'es' ? dest.subtitleEs : dest.subtitleEn
@@ -82,7 +80,7 @@ function InfoCard({ dest, locale }: { dest: typeof destinations[0]; locale: stri
   const waUrl = getWhatsAppQuoteUrl({ name: '', phone: '', destination: name, travelers: '2', date: '', budget: '', experiences: [] }, locale)
 
   const inner = (
-    <div className="p-6 flex flex-col gap-3.5 h-full">
+    <div className="p-6 flex flex-col gap-3.5" style={{ height: '100%' }}>
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-2.5">
           <span className="text-3xl">{dest.flag}</span>
@@ -132,204 +130,196 @@ function InfoCard({ dest, locale }: { dest: typeof destinations[0]; locale: stri
   )
 
   return (
-    <div className="h-full" style={{ perspective: 1000 }}>
+    <div style={{ height: '100%', perspective: 1000 }}>
       {g ? (
         <BorderGlow glowColor={g.glowColor} backgroundColor={g.backgroundColor} colors={[...g.colors]}
           borderRadius={22} glowRadius={28} glowIntensity={1.1} edgeSensitivity={26} coneSpread={28} animated className="h-full">
           {inner}
         </BorderGlow>
-      ) : <div className="rounded-3xl border h-full bg-white">{inner}</div>}
+      ) : <div className="rounded-3xl border bg-white" style={{ height: '100%' }}>{inner}</div>}
     </div>
   )
 }
 
-/* ─── Main component ─────────────────────────────────────────────────────────── */
+/* ─── Main component ──────────────────────────────────────────────────────────── */
 export default function StorytellingSection() {
-  const locale   = useLocale()
-  const outerRef = useRef<HTMLDivElement>(null)
-  const routeRef = useRef<HTMLDivElement>(null)
-  const isEs = locale === 'es'
+  const locale = useLocale()
+  const isEs   = locale === 'es'
+
+  /* DOM refs */
+  const outerRef  = useRef<HTMLDivElement>(null)
+  const headerRef = useRef<HTMLDivElement>(null)
+  const routeRef  = useRef<HTMLDivElement>(null)
+  const stageRef  = useRef<HTMLDivElement>(null)
+  const footerRef = useRef<HTMLDivElement>(null)
+  const slide0Ref = useRef<HTMLDivElement>(null)
+  const slide1Ref = useRef<HTMLDivElement>(null)
+  const barRef    = useRef<HTMLDivElement>(null)
+  const planeRef  = useRef<HTMLDivElement>(null)
 
   /*
-   * Manual scroll tracking — more reliable than useScroll({ target }) in
-   * Next.js 15 / React 19 because we compute the section offset AFTER mount
-   * and subscribe directly to the window scroll event.
-   *
-   * rawProgress: 0 when section top hits viewport top,
-   *              1 when section bottom hits viewport bottom.
-   *
-   * NO GSAP pin, NO DOM manipulation → zero removeChild errors.
+   * Measure and set the stage height explicitly at runtime.
+   * This is more reliable than any h-full / flex-1 CSS chain because
+   * it reads actual rendered pixel heights and sets an inline style directly.
    */
-  const rawProgress = useMotionValue(0)
-
   useEffect(() => {
-    const compute = () => {
-      const el = outerRef.current
-      if (!el) return
-      const scrollTop  = window.scrollY
-      const sectionTop = el.offsetTop
-      // Total scroll distance = section height minus one viewport
-      const scrollRange = el.offsetHeight - window.innerHeight
-      if (scrollRange <= 0) return
-      const p = Math.min(Math.max((scrollTop - sectionTop) / scrollRange, 0), 1)
-      rawProgress.set(p)
+    const measure = () => {
+      if (!stageRef.current) return
+      const vh      = window.innerHeight
+      const headerH = headerRef.current?.offsetHeight ?? 0
+      const routeH  = routeRef.current?.offsetHeight  ?? 0
+      const footerH = footerRef.current?.offsetHeight ?? 0
+      // 48px padding-top + 24px padding-bottom + 16px mb-4 header + 16px mb-4 route + 12px pt-3 footer
+      const reserved = 48 + 24 + 16 + 16 + 12 + headerH + routeH + footerH
+      const h = Math.max(280, vh - reserved)
+      stageRef.current.style.height = `${h}px`
+    }
+    // Two-pass: once immediately (approximation) and once after fonts/images settle
+    measure()
+    const t = setTimeout(measure, 300)
+    window.addEventListener('resize', measure)
+    return () => { clearTimeout(t); window.removeEventListener('resize', measure) }
+  }, [])
+
+  /*
+   * GSAP ScrollTrigger animation.
+   * trigger = outerRef (300vh), scrub = true → tied to scroll position.
+   * No GSAP pin: CSS sticky handles the panel. No DOM mutations → no removeChild errors.
+   */
+  useGSAP(() => {
+    if (!outerRef.current) return
+
+    // Hide slides initially
+    gsap.set([slide0Ref.current, slide1Ref.current], { opacity: 0, x: 40 })
+    gsap.set(barRef.current,   { scaleX: 0 })
+    gsap.set(planeRef.current, { left: '0%' })
+
+    const st = {
+      trigger: outerRef.current,
+      start:   'top top',
+      end:     'bottom bottom',
+      scrub:   1.4,
     }
 
-    // Compute once on mount (handles cases where page loads mid-scroll)
-    compute()
-    window.addEventListener('scroll', compute, { passive: true })
-    window.addEventListener('resize', compute, { passive: true })
-    return () => {
-      window.removeEventListener('scroll', compute)
-      window.removeEventListener('resize', compute)
-    }
-  }, [rawProgress])
+    // Main timeline: slides + progress bar
+    const tl = gsap.timeline({ scrollTrigger: st })
 
-  // Smooth spring feels more physical than raw progress jumps
-  const smooth = useSpring(rawProgress, { stiffness: 90, damping: 25, restDelta: 0.001 })
+    // Slide 0 — Colombia: enter (0→12%), hold (12→55%), exit (55→68%)
+    tl.to(slide0Ref.current, { opacity: 1, x: 0,   duration: 0.12, ease: 'power2.out'  }, 0)
+      .to(slide0Ref.current, { opacity: 1, x: 0,   duration: 0.43                       }, 0.12)
+      .to(slide0Ref.current, { opacity: 0, x: -40, duration: 0.13, ease: 'power2.in'   }, 0.55)
 
-  /* ── Slide 0 (Colombia): fully visible from entry, exits at 0.65 ── */
-  const s0Opacity = useTransform(smooth, [0, 0.07, 0.52, 0.65], [0, 1, 1, 0])
-  const s0X       = useTransform(smooth, [0, 0.07, 0.52, 0.65], [40, 0, 0, -40])
+    // Slide 1 — Roma: enter (60→75%), hold (75→100%)
+      .to(slide1Ref.current, { opacity: 1, x: 0,   duration: 0.15, ease: 'power2.out'  }, 0.60)
+      .to(slide1Ref.current, { opacity: 1, x: 0,   duration: 0.25                       }, 0.75)
 
-  /* ── Slide 1 (Roma): enters at 0.58, fully visible at 0.75 ── */
-  const s1Opacity = useTransform(smooth, [0.58, 0.75, 1], [0, 1, 1])
-  const s1X       = useTransform(smooth, [0.58, 0.75], [40, 0])
+    // Progress bar (full scroll)
+      .fromTo(barRef.current, { scaleX: 0 }, { scaleX: 1, ease: 'none', duration: 1    }, 0)
 
-  /* ── Progress bar ── */
-  const barScale = useTransform(smooth, [0, 1], [0, 1])
+    // Plane (independent, same trigger)
+    gsap.timeline({ scrollTrigger: st })
+      .fromTo(planeRef.current,
+        { left: '0%' },
+        { left: 'calc(100% - 56px)', ease: 'none', duration: 0.88 },
+        0)
 
-  /* ── Plane: travels full route width, fades near FCO ── */
-  const planePercent = useTransform(smooth, [0, 0.88], ['0%', 'calc(100% - 56px)'])
-  const planeOpacity = useTransform(smooth, [0.85, 1], [1, 0])
+  }, { scope: outerRef })
 
   return (
     /*
-     * Outer div: 300vh — creates the scroll space.
-     * bg-[#F8FAFC] prevents the dark page background from showing through.
+     * Outer div: 300vh — provides the scroll distance.
+     * Inner sticky div: stays in viewport while the outer scrolls.
+     * GSAP animates the slides based on scroll progress through outerRef.
      */
     <div ref={outerRef} style={{ height: '300vh' }} className="relative bg-[#F8FAFC]">
-
-      {/* Inner sticky panel — CSS handles the "pin", no GSAP DOM modification */}
-      <div className="sticky top-0 h-screen overflow-hidden bg-[#F8FAFC]">
+      <div className="sticky top-0 overflow-hidden bg-[#F8FAFC]" style={{ height: '100svh' }}>
 
         {/* Dot grid */}
         <div className="absolute inset-0 pointer-events-none"
           style={{ backgroundImage: 'radial-gradient(rgba(15,23,42,0.05) 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
 
-        {/* Progress bar — driven by Framer Motion */}
-        <motion.div
-          className="absolute top-0 left-0 right-0 h-[2px] origin-left z-10"
-          style={{ background: 'linear-gradient(90deg,#22C55E,#F59E0B)', scaleX: barScale }}
+        {/* Progress bar */}
+        <div
+          ref={barRef}
+          className="absolute top-0 left-0 right-0 z-10"
+          style={{ height: 2, background: 'linear-gradient(90deg,#22C55E,#F59E0B)', transformOrigin: 'left center' }}
         />
 
-        {/*
-          CSS Grid outer layout — 4 rows: header | route | slides(1fr) | footer
-          1fr for the slides row guarantees it gets ALL remaining height after the
-          other rows take their natural sizes. This is more reliable than
-          flex-col + flex-1 + min-h-0 which can fail to propagate height through
-          the absolute-positioned slide children.
-        */}
+        {/* Content column */}
         <div
-          className="relative z-[1] h-full"
-          style={{
-            display: 'grid',
-            gridTemplateRows: 'auto auto 1fr auto',
-            maxWidth: '1280px',
-            margin: '0 auto',
-            padding: '3rem 1.5rem 1.5rem',
-          }}
+          className="relative z-[1]"
+          style={{ height: '100%', maxWidth: 1280, margin: '0 auto', padding: '3rem 1.5rem 1.5rem', display: 'flex', flexDirection: 'column' }}
         >
 
-          {/* Row 1 — Header */}
-          <div className="mb-4">
-            <span className="flex items-center gap-2 font-label text-[10px] text-[#22C55E]/70 uppercase tracking-[0.22em] mb-3">
-              <span className="w-5 h-px bg-[#22C55E]/40" />
+          {/* Header */}
+          <div ref={headerRef} className="flex-none mb-4">
+            <span className="flex items-center gap-2 font-label text-[10px] uppercase tracking-[0.22em] mb-3" style={{ color: 'rgba(34,197,94,0.7)' }}>
+              <span className="w-5 h-px" style={{ background: 'rgba(34,197,94,0.4)' }} />
               {isEs ? 'Tu próximo viaje' : 'Your next journey'}
             </span>
-            <h2 className="font-serif font-bold text-3xl sm:text-4xl lg:text-5xl text-[#0F172A] leading-tight">
-              {(isEs ? 'Elige tu destino extraordinario' : 'Choose your extraordinary destination')
-                .split(' ').map((word, i) => (
-                  <motion.span
-                    key={i}
-                    className="inline-block mr-[0.22em]"
-                    initial={{ opacity: 0, y: 32 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: i * 0.06, ease: [0.22, 1, 0.36, 1] }}
-                  >
-                    {word}
-                  </motion.span>
-                ))}
+            <h2 className="font-serif font-bold text-[#0F172A] leading-tight" style={{ fontSize: 'clamp(1.75rem, 4vw, 3rem)' }}>
+              {isEs ? 'Elige tu destino extraordinario' : 'Choose your extraordinary destination'}
             </h2>
           </div>
 
-          {/* Row 2 — Flight route */}
-          <div ref={routeRef} className="relative h-9 mb-4 overflow-visible">
+          {/* Flight route BOG → FCO */}
+          <div ref={routeRef} className="flex-none relative mb-4 overflow-visible" style={{ height: 36 }}>
             <div className="absolute top-1/2 left-8 right-8 border-t-2 border-dashed" style={{ borderColor: '#22C55E28' }} />
             <div className="absolute left-2 top-1/2 -translate-y-1/2 flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-[#22C55E] ring-4 ring-[#22C55E]/20" />
-              <span className="font-label text-[9px] text-[#475569] uppercase tracking-wider">BOG</span>
+              <div className="w-3 h-3 rounded-full ring-4" style={{ background: '#22C55E', boxShadow: '0 0 0 4px rgba(34,197,94,0.2)' }} />
+              <span className="font-label text-[9px] uppercase tracking-wider" style={{ color: '#475569' }}>BOG</span>
             </div>
             <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-2">
-              <span className="font-label text-[9px] text-[#475569] uppercase tracking-wider">FCO</span>
-              <div className="w-3 h-3 rounded-full bg-[#F59E0B] ring-4 ring-[#F59E0B]/20" />
+              <span className="font-label text-[9px] uppercase tracking-wider" style={{ color: '#475569' }}>FCO</span>
+              <div className="w-3 h-3 rounded-full ring-4" style={{ background: '#F59E0B', boxShadow: '0 0 0 4px rgba(245,158,11,0.2)' }} />
             </div>
-            <motion.div
-              className="absolute top-1/2 -translate-y-1/2"
-              style={{ left: planePercent, opacity: planeOpacity }}
-            >
+            <div ref={planeRef} className="absolute top-1/2 -translate-y-1/2" style={{ left: '0%' }}>
               <svg width="22" height="22" viewBox="0 0 24 24" fill="#0F172A"
                 style={{ transform: 'rotate(90deg)', filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.18))' }}>
                 <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" />
               </svg>
-            </motion.div>
+            </div>
           </div>
 
-          {/* Row 3 — Slides (1fr: fills all remaining vertical space) */}
-          <div className="relative min-h-0">
+          {/* Slides stage — height set by useEffect */}
+          <div ref={stageRef} className="relative flex-1" style={{ minHeight: 280 }}>
 
             {/* Slide 0 — Colombia */}
-            <motion.div
-              className="absolute inset-0"
-              style={{ opacity: s0Opacity, x: s0X }}
-            >
-              <div className="flex gap-6 h-full">
-                <div className="flex-1 min-w-0 min-h-0">
+            <div ref={slide0Ref} className="absolute inset-0" style={{ opacity: 0 }}>
+              <div className="flex gap-6" style={{ height: '100%' }}>
+                <div className="flex-1 min-w-0" style={{ height: '100%' }}>
                   <InfoCard dest={destinations[0]} locale={locale} />
                 </div>
                 <div className="hidden lg:flex flex-1 min-w-0 items-center justify-center">
                   <PhotoStack slug={destinations[0].slug} />
                 </div>
               </div>
-            </motion.div>
+            </div>
 
             {/* Slide 1 — Roma */}
-            <motion.div
-              className="absolute inset-0"
-              style={{ opacity: s1Opacity, x: s1X }}
-            >
-              <div className="flex gap-6 h-full">
-                <div className="flex-1 min-w-0 min-h-0">
+            <div ref={slide1Ref} className="absolute inset-0" style={{ opacity: 0 }}>
+              <div className="flex gap-6" style={{ height: '100%' }}>
+                <div className="flex-1 min-w-0" style={{ height: '100%' }}>
                   <InfoCard dest={destinations[1]} locale={locale} />
                 </div>
                 <div className="hidden lg:flex flex-1 min-w-0 items-center justify-center">
                   <PhotoStack slug={destinations[1].slug} />
                 </div>
               </div>
-            </motion.div>
+            </div>
           </div>
 
-          {/* Row 4 — Footer strip */}
-          <div className="pt-3 flex items-center justify-between">
-            <p className="font-sans text-[#94A3B8] text-xs">
+          {/* Footer strip */}
+          <div ref={footerRef} className="flex-none pt-3 flex items-center justify-between">
+            <p className="font-sans text-xs" style={{ color: '#94A3B8' }}>
               {isEs ? 'Desplázate para explorar' : 'Scroll to explore'}
             </p>
             <div className="flex items-center gap-2">
-              <div className="w-6 h-1 rounded-full bg-[#22C55E]/50" />
-              <div className="w-6 h-1 rounded-full bg-[#F59E0B]/50" />
+              <div className="w-6 h-1 rounded-full" style={{ background: 'rgba(34,197,94,0.5)' }} />
+              <div className="w-6 h-1 rounded-full" style={{ background: 'rgba(245,158,11,0.5)' }} />
             </div>
           </div>
+
         </div>
       </div>
     </div>
