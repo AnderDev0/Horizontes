@@ -223,10 +223,26 @@ export default function StorytellingSection() {
           style={{ background: 'linear-gradient(90deg,#22C55E,#F59E0B)', scaleX: barScale }}
         />
 
-        <div className="relative z-[1] h-full flex flex-col container-wide py-12">
+        {/*
+          CSS Grid outer layout — 4 rows: header | route | slides(1fr) | footer
+          1fr for the slides row guarantees it gets ALL remaining height after the
+          other rows take their natural sizes. This is more reliable than
+          flex-col + flex-1 + min-h-0 which can fail to propagate height through
+          the absolute-positioned slide children.
+        */}
+        <div
+          className="relative z-[1] h-full"
+          style={{
+            display: 'grid',
+            gridTemplateRows: 'auto auto 1fr auto',
+            maxWidth: '1280px',
+            margin: '0 auto',
+            padding: '3rem 1.5rem 1.5rem',
+          }}
+        >
 
-          {/* Header */}
-          <div className="mb-6 flex-shrink-0">
+          {/* Row 1 — Header */}
+          <div className="mb-4">
             <span className="flex items-center gap-2 font-label text-[10px] text-[#22C55E]/70 uppercase tracking-[0.22em] mb-3">
               <span className="w-5 h-px bg-[#22C55E]/40" />
               {isEs ? 'Tu próximo viaje' : 'Your next journey'}
@@ -248,23 +264,17 @@ export default function StorytellingSection() {
             </h2>
           </div>
 
-          {/* Flight route */}
-          <div ref={routeRef} className="relative h-9 flex-shrink-0 mb-5 overflow-visible">
+          {/* Row 2 — Flight route */}
+          <div ref={routeRef} className="relative h-9 mb-4 overflow-visible">
             <div className="absolute top-1/2 left-8 right-8 border-t-2 border-dashed" style={{ borderColor: '#22C55E28' }} />
-
-            {/* BOG */}
             <div className="absolute left-2 top-1/2 -translate-y-1/2 flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-[#22C55E] ring-4 ring-[#22C55E]/20" />
               <span className="font-label text-[9px] text-[#475569] uppercase tracking-wider">BOG</span>
             </div>
-
-            {/* FCO */}
             <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-2">
               <span className="font-label text-[9px] text-[#475569] uppercase tracking-wider">FCO</span>
               <div className="w-3 h-3 rounded-full bg-[#F59E0B] ring-4 ring-[#F59E0B]/20" />
             </div>
-
-            {/* Plane — driven by Framer Motion, no GSAP */}
             <motion.div
               className="absolute top-1/2 -translate-y-1/2"
               style={{ left: planePercent, opacity: planeOpacity }}
@@ -276,16 +286,21 @@ export default function StorytellingSection() {
             </motion.div>
           </div>
 
-          {/* Slides stage */}
-          <div className="relative flex-1 min-h-0">
+          {/* Row 3 — Slides (1fr: fills all remaining vertical space) */}
+          <div className="relative min-h-0">
+
             {/* Slide 0 — Colombia */}
             <motion.div
               className="absolute inset-0"
               style={{ opacity: s0Opacity, x: s0X }}
             >
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-center h-full px-1">
-                <div className="h-full"><InfoCard dest={destinations[0]} locale={locale} /></div>
-                <div className="hidden lg:flex items-center justify-center"><PhotoStack slug={destinations[0].slug} /></div>
+              <div className="flex gap-6 h-full">
+                <div className="flex-1 min-w-0 min-h-0">
+                  <InfoCard dest={destinations[0]} locale={locale} />
+                </div>
+                <div className="hidden lg:flex flex-1 min-w-0 items-center justify-center">
+                  <PhotoStack slug={destinations[0].slug} />
+                </div>
               </div>
             </motion.div>
 
@@ -294,15 +309,19 @@ export default function StorytellingSection() {
               className="absolute inset-0"
               style={{ opacity: s1Opacity, x: s1X }}
             >
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-center h-full px-1">
-                <div className="h-full"><InfoCard dest={destinations[1]} locale={locale} /></div>
-                <div className="hidden lg:flex items-center justify-center"><PhotoStack slug={destinations[1].slug} /></div>
+              <div className="flex gap-6 h-full">
+                <div className="flex-1 min-w-0 min-h-0">
+                  <InfoCard dest={destinations[1]} locale={locale} />
+                </div>
+                <div className="hidden lg:flex flex-1 min-w-0 items-center justify-center">
+                  <PhotoStack slug={destinations[1].slug} />
+                </div>
               </div>
             </motion.div>
           </div>
 
-          {/* Footer strip */}
-          <div className="flex-shrink-0 pt-4 flex items-center justify-between">
+          {/* Row 4 — Footer strip */}
+          <div className="pt-3 flex items-center justify-between">
             <p className="font-sans text-[#94A3B8] text-xs">
               {isEs ? 'Desplázate para explorar' : 'Scroll to explore'}
             </p>
